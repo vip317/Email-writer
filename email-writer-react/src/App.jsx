@@ -1,8 +1,6 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import axios from 'axios'
+import { useState } from 'react';
+import axios from 'axios';
+import './App.css';
 import {
   Container,
   Box,
@@ -14,65 +12,78 @@ import {
   MenuItem,
   Button,
   CircularProgress,
+  Alert,
+  Snackbar,
 } from '@mui/material';
 
 function App() {
   const [emailContent, setEmailContent] = useState('');
-  const [tone, setTone] = useState('');
+  const [tone, setTone] = useState('professional');
   const [generatedReply, setGeneratedReply] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showCopied, setShowCopied] = useState(false);
+
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080/api/email/generate';
 
   const handleSubmit = async () => {
+    if (!emailContent.trim()) {
+      setError('Please enter email content.');
+      return;
+    }
+
     setLoading(true);
     setError('');
-    try {
-      const response = await axios.post("http://localhost:8080/api/email/generate", {
-        emailContent,
-        tone
-      });
+    setGeneratedReply('');
 
-      // Adjust this depending on your backend response
-      setGeneratedReply(
-        typeof response.data === 'string'
-          ? response.data
-          : JSON.stringify(response.data)
+    try {
+      const { data } = await axios.post(backendUrl, { emailContent, tone });
+
+      // Expecting JSON with "generatedReply" key
+      setGeneratedReply(data.generatedReply || JSON.stringify(data, null, 2));
+    } catch (err) {
+      console.error(err);
+      setError(
+        '❌ Failed to generate email reply. Check backend, network, or API key.'
       );
-    } catch (error) {
-      setError('Failed to generate email reply. Please try again');
-      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleCopy = () => {
+    navigator.clipboard.writeText(generatedReply);
+    setShowCopied(true);
+  };
+
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h3" component="h1" gutterBottom>
-        Email Reply Generator
+      <Typography variant="h4" align="center" gutterBottom>
+        ✉️ AI Smart Email Assistant
       </Typography>
+
       <Box sx={{ mx: 3 }}>
         <TextField
           fullWidth
           multiline
           rows={6}
           variant="outlined"
-          label="Original Email content"
+          label="Original Email Content"
           value={emailContent}
           onChange={(e) => setEmailContent(e.target.value)}
           sx={{ mb: 2 }}
         />
 
         <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel id="tone-select-label">Tone (Optional)</InputLabel>
+          <InputLabel id="tone-select-label">Tone</InputLabel>
           <Select
             labelId="tone-select-label"
             id="tone-select"
             value={tone}
-            label="Tone (Optional)"
+            label="Tone"
             onChange={(e) => setTone(e.target.value)}
           >
-            <MenuItem value="">None</MenuItem>
             <MenuItem value="professional">Professional</MenuItem>
             <MenuItem value="casual">Casual</MenuItem>
             <MenuItem value="friendly">Friendly</MenuItem>
@@ -81,42 +92,46 @@ function App() {
 
         <Button
           variant="contained"
+          color="primary"
           onClick={handleSubmit}
-          disabled={!emailContent || loading}
+          disabled={loading}
           fullWidth
         >
-          {loading ? <CircularProgress size={24} /> : "Generate Reply"}
+          {loading ? <CircularProgress size={24} /> : 'Generate Reply'}
         </Button>
       </Box>
 
       {error && (
-        <Typography color="error" sx={{ mb: 2 }}>
+        <Alert severity="error" sx={{ mt: 3 }}>
           {error}
-        </Typography>
+        </Alert>
       )}
 
       {generatedReply && (
         <Box sx={{ mt: 3 }}>
           <Typography variant="h6" gutterBottom>
-            Generated reply:
+            Generated Reply:
           </Typography>
           <TextField
             fullWidth
             multiline
             rows={6}
             variant="outlined"
-            value={generatedReply || ''}
+            value={generatedReply}
             inputProps={{ readOnly: true }}
           />
-          <Button
-            variant="outlined"
-            sx={{ mt: 2 }}
-            onClick={() => navigator.clipboard.writeText(generatedReply)}
-          >
-            Copy to clipboard
+          <Button variant="outlined" sx={{ mt: 2 }} onClick={handleCopy}>
+            Copy to Clipboard
           </Button>
         </Box>
       )}
+
+      <Snackbar
+        open={showCopied}
+        autoHideDuration={2000}
+        onClose={() => setShowCopied(false)}
+        message="Copied to clipboard!"
+      />
     </Container>
   );
 }

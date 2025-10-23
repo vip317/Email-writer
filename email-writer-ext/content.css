@@ -1,0 +1,61 @@
+.ai-container {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  margin-right: 6px;
+}
+
+
+.ai-tone-select {
+  height: 36px;            
+  line-height: 20px;
+  font-size: 13px;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  color: #202124;
+  background-color: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 5px;
+  padding: 0 8px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%23333' height='10' viewBox='0 0 10 6' width='10' xmlns='http://www.w3.org/2000/svg'><path d='M0 0l5 6 5-6z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 10px 6px;
+
+  margin-right: 4px;
+}
+
+.ai-reply-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;            
+  min-width: 72px;         
+  padding: 0 16px;         
+  border-radius: 20px;
+  font-size: 13px;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  font-weight: 500;
+  line-height: 20px;
+  background-color: #1a73e8;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.ai-reply-button:hover {
+  background-color: #155ab6;
+}
+
+.ai-reply-button span {
+  display: inline-block;
+}
+
+.ai-loading {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
